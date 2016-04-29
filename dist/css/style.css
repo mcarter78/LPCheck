@@ -1,2 +1,5 @@
 body {
   width: 100%; }
+
+#main-component * {
+  display: inline; }
