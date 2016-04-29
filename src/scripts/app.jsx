@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { createStore } from 'redux'
+import fetch from 'node-fetch'
+fetch.Promise = require('bluebird')
 
 const myInit = {
   method: 'GET',
