@@ -1,3 +1,27 @@
 body {
   width: 100%;
+  font-family: helvetica, sans-serif;
+}
+
+#form {
+  input {
+    display: block;
+    margin-bottom:5px;
+  }
+  button {
+    margin-bottom: 5px;
+  }
+}
+
+#logo {
+  width: 100px;
+}
+
+#title {
+  font-weight: bold;
+  font-size: 4em;
+}
+
+#search-again {
+  margin: 20px 0;
 }

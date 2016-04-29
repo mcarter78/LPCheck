@@ -29,7 +29,7 @@ class Main extends React.Component {
     this.getCollection()
   }
   getCollection() {
-    fetch('https://api.discogs.com/users/mcarter78/collection/folders/0/releases?page=1&per_page=500', myInit)
+    fetch('https://api.discogs.com/users/mcarter78/collection/folders/0/releases?page=1&per_page=900', myInit)
       .then(function(res) {
         return res.json()
       })
@@ -42,34 +42,48 @@ class Main extends React.Component {
   }
   searchCollection(e) {
     e.preventDefault()
-    console.log(e.target.artistName.value)
     const data = store.getState()
-    const matches = []
-    data.map(function(record, index) {
+    let matches = []
+    data.forEach(function(record) {
       let artistInput = e.target.artistName.value.toLowerCase()
       let albumInput = e.target.albumTitle.value.toLowerCase()
       let recordArtist = record.basic_information.artists[0].name.toLowerCase()
       let recordTitle = record.basic_information.title.toLowerCase()
-      if(artistInput === recordArtist || albumInput === recordTitle) {
+      if(artistInput === recordArtist && albumInput === recordTitle) {
+        return matches = [record]
+      }
+      else if(artistInput === recordArtist || albumInput === recordTitle) {
         matches.push(record)
       }
     })
-    console.log(matches)
+    if(matches.length === 0) {
+      matches.push('No Matches')
+    }
     store.dispatch({
       type: 'RECORDS',
       data: matches
     })
-    e.target.artistName.value = ''
-    e.target.albumTitle.value = ''
+    const main = document.getElementById('main')
+    const form = document.getElementById('form')
+    main.removeChild(form)
+    const b = document.createElement('button')
+    b.setAttribute('class', 'btn btn-primary')
+    b.setAttribute('id', 'search-again')
+    b.innerText = 'Search Again'
+    main.appendChild(b)
+    b.addEventListener('click', function() {
+      window.location.reload()
+    })
   }
   render() {
     return (
-      <div>
-        <h1>TestPressed</h1>
-        <form onSubmit={this.searchCollection}>
-          <input type="text" name="artistName" placeholder="Artist Name"/>
-          <input type="text" name="albumTitle" placeholder="Album Title"/>
-          <input type="submit"/>
+      <div id="main">
+        <h1 id="title">LPCheck</h1>
+        <h4>Powered by <img id="logo" src="/discogs.png"/></h4>
+        <form className="form-group" id="form" onSubmit={this.searchCollection}>
+          <input className="form-control" type="text" name="artistName" placeholder="Artist Name"/>
+          <input className="form-control" type="text" name="albumTitle" placeholder="Album Title"/>
+          <button className="btn btn-primary" type="submit">Submit</button>
         </form>
       </div>
     )
@@ -82,7 +96,18 @@ const renderData = () => {
   const dataDiv = document.getElementById('data')
   let data = store.getState()
   console.log(data)
-  if(data !== '') {
+  if(data === '') {
+    const i = document.createElement('img')
+    i.setAttribute('src', '/loading_spinner.gif')
+    dataDiv.appendChild(i)
+  }
+  else if(data[0] === 'No Matches'){
+    dataDiv.innerHTML = ''
+    const p = document.createElement('p')
+    p.innerText = data[0]
+    dataDiv.appendChild(p)
+  }
+  else {
     data = data.sort(function(a,b) {
       if(a.basic_information.artists[0].name < b.basic_information.artists[0].name) return -1;
       if(a.basic_information.artists[0].name > b.basic_information.artists[0].name) return 1;
