@@ -1,1 +1,1 @@
-#form button,#form input{margin-bottom:5px}body{width:100%;font-family:helvetica,sans-serif}#form input{display:block}#logo{width:100px}#title{font-weight:700;font-size:4em}#search-again{margin:20px 0}
+#form button,#form input{margin-bottom:5px}body{width:100%;font-family:helvetica,sans-serif}#form input{display:block}#wrapper{-webkit-box-flex:1;-webkit-flex:1;-ms-flex:1;flex:1}#logo{width:100px}#title{font-weight:700;font-size:4em}#search-again{margin:20px 0}

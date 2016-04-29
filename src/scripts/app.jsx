@@ -2,13 +2,11 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { createStore } from 'redux'
 
-const myHeaders = new Headers({
-  'User-Agent': 'TestPressed/1.0'
-})
-
 const myInit = {
   method: 'GET',
-  headers: myHeaders
+  headers: {
+    'User-Agent': 'TestPressed/1.0'
+  }
 }
 
 const records = (state='', action) => {
