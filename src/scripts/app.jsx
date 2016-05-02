@@ -103,11 +103,11 @@ class Main extends React.Component {
     return (
       <div id="main">
         <h1 id="title">LPCheck</h1>
-        <h4>Powered by <img id="logo" src="/discogs.png"/></h4>
+        <h4>Powered by <a href="https://www.discogs.com" target="_blank"><img id="logo" src="/discogs.png"/></a></h4>
         <p>LPCheck is a simple tool to check if you own a specific record.  First, enter your Discogs.com
           username and click submit to get your collection, then search by Artist Name and/or Album Title.</p>
         <form className="form-group" onSubmit={this.setUser.bind(this)}>
-          <input id="userInput" className="form-control" type="text" name="userName" placeholder="Discogs Username"/>
+          <input id="userInput" className="form-control" type="text" name="userName" placeholder="Discogs Username" autoFocus/>
           <button className="btn btn-primary" type="submit">Submit Username</button><br/>
           <a href="#" onClick={this.clearUser}>clear User</a>
         </form>
