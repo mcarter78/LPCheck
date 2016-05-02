@@ -2,11 +2,11 @@ body {
   width: 100%;
   font-family: helvetica, sans-serif; }
 
-#form input {
+.form-group input {
   display: block;
   margin-bottom: 5px; }
 
-#form button {
+.form-group button {
   margin-bottom: 5px; }
 
 #wrapper {

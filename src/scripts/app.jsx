@@ -11,8 +11,10 @@ const myInit = {
   }
 }
 
-const records = (state='', action) => {
+const records = (state, action) => {
   switch(action.type) {
+    case 'GETUSER':
+      return state = ''
     case 'GETALL':
       return state = action.data
     case 'RECORDS':
@@ -26,10 +28,32 @@ const store = createStore(records)
 
 class Main extends React.Component {
   componentDidMount() {
-    this.getCollection()
+    if(window.localStorage.discogsUsername) {
+      store.dispatch({
+        type: 'GETUSER',
+      })
+      const userInput = document.getElementById('userInput')
+      userInput.value = window.localStorage.discogsUsername
+      this.getCollection(window.localStorage.discogsUsername)
+    }
   }
-  getCollection() {
-    fetch('https://api.discogs.com/users/mcarter78/collection/folders/0/releases?page=1&per_page=900', myInit)
+  setUser(e) {
+    e.preventDefault()
+    store.dispatch({
+      type: 'GETUSER',
+    })
+    const user = e.target.userName.value
+    window.localStorage.discogsUsername = user
+    this.getCollection(user)
+  }
+  clearUser() {
+    console.log('clearing')
+    window.localStorage.removeItem('discogsUsername')
+    window.location.reload()
+  }
+  getCollection(user) {
+    console.log(user)
+    fetch('https://api.discogs.com/users/' + user + '/collection/folders/0/releases?page=1&per_page=900', myInit)
       .then(function(res) {
         return res.json()
       })
@@ -80,10 +104,17 @@ class Main extends React.Component {
       <div id="main">
         <h1 id="title">LPCheck</h1>
         <h4>Powered by <img id="logo" src="/discogs.png"/></h4>
+        <p>LPCheck is a simple tool to check if you own a specific record.  First, enter your Discogs.com
+          username and click submit to get your collection, then search by Artist Name and/or Album Title.</p>
+        <form className="form-group" onSubmit={this.setUser.bind(this)}>
+          <input id="userInput" className="form-control" type="text" name="userName" placeholder="Discogs Username"/>
+          <button className="btn btn-primary" type="submit">Submit Username</button><br/>
+          <a href="#" onClick={this.clearUser}>clear User</a>
+        </form>
         <form className="form-group" id="form" onSubmit={this.searchCollection}>
           <input className="form-control" type="text" name="artistName" placeholder="Artist Name"/>
           <input className="form-control" type="text" name="albumTitle" placeholder="Album Title"/>
-          <button className="btn btn-primary" type="submit">Submit</button>
+          <button className="btn btn-primary" type="submit">Submit Search</button>
         </form>
       </div>
     )
@@ -96,31 +127,38 @@ const renderData = () => {
   const dataDiv = document.getElementById('data')
   let data = store.getState()
   console.log(data)
-  if(data === '') {
+  if(Array.isArray(data)) {
+    if(data[0] === 'No Matches'){
+      dataDiv.innerHTML = ''
+      const p = document.createElement('p')
+      p.innerText = data[0]
+      dataDiv.appendChild(p)
+    }
+    else {
+      data = data.sort(function(a,b) {
+        if(a.basic_information.artists[0].name < b.basic_information.artists[0].name) return -1;
+        if(a.basic_information.artists[0].name > b.basic_information.artists[0].name) return 1;
+        return 0;
+      })
+      dataDiv.innerHTML = ''
+      const h4 = document.createElement('h4')
+      h4.innerText = window.localStorage.discogsUsername + ' (' + data.length + ' records)'
+      dataDiv.appendChild(h4)
+      data.map(function(record, index) {
+        const p = document.createElement('p')
+        p.setAttribute('key', index)
+        p.innerText = record.basic_information.artists[0].name + ' - ' + record.basic_information.title
+        dataDiv.appendChild(p)
+      })
+    }
+  }
+  else if(data === '') {
     const i = document.createElement('img')
     i.setAttribute('src', '/loading_spinner.gif')
     dataDiv.appendChild(i)
   }
-  else if(data[0] === 'No Matches'){
-    dataDiv.innerHTML = ''
-    const p = document.createElement('p')
-    p.innerText = data[0]
-    dataDiv.appendChild(p)
-  }
-  else {
-    data = data.sort(function(a,b) {
-      if(a.basic_information.artists[0].name < b.basic_information.artists[0].name) return -1;
-      if(a.basic_information.artists[0].name > b.basic_information.artists[0].name) return 1;
-      return 0;
-    })
-    dataDiv.innerHTML = ''
-    data.map(function(record, index) {
-      const p = document.createElement('p')
-      p.setAttribute('key', index)
-      p.innerText = record.basic_information.artists[0].name + ' - ' + record.basic_information.title
-      dataDiv.appendChild(p)
-    })
-  }
+
+
   ReactDOM.render(
     <Main/>,
     document.getElementById('main-component')
